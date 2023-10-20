@@ -8,6 +8,9 @@ class CameraView extends StatelessWidget {
   const CameraView({super.key});
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
 
     return Scaffold(
       body: GetBuilder<ScanController>(
@@ -19,21 +22,25 @@ class CameraView extends StatelessWidget {
               ? Stack(
                 children: [
                   CameraPreview(controller.cameraController),
-                  Container(
-                    width:  100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.green,width: 4),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                            color: Colors.white,
-                            child: Text("akjsdhfgaskdjhfg ${controller.label}"),
-                        ),
-                      ],
+                  Positioned(
+                    top: (controller.y)*(screenHeight),
+                    left: (controller.x)*(screenWidth),
+                    child: Container(
+                      width:  (controller.w)*context.width,
+                      height: (controller.h)*context.height,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.green,width: 4),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                              color: Colors.white,
+                              child: Text("${controller.label}"),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

@@ -70,34 +70,67 @@ class ScanController extends GetxController{
   }
 
   objectDectector(CameraImage image) async{
-    var detector = await Tflite.runModelOnFrame(
-        bytesList: image.planes.map((e){
-          return e.bytes;
-    }).toList(),
-    asynch: true,
-    imageHeight: image.height,
-    imageWidth: image.width,
-    imageMean: 127.5,
-    imageStd: 127.5,
-    numResults: 1,
-    rotation: 90,
-    threshold: 0.4
+    // var detector = await Tflite.runModelOnFrame(
+    //     bytesList: image.planes.map((e){
+    //       return e.bytes;
+    // }).toList(),
+    // asynch: true,
+    // imageHeight: image.height,
+    // imageWidth: image.width,
+    // imageMean: 127.5,
+    // imageStd: 127.5,
+    // numResults: 1,
+    // rotation: 90,
+    // threshold: 0.4
+    // );
+
+    var detector = await Tflite.detectObjectOnFrame(
+        bytesList: image.planes.map((plane) {return plane.bytes;}).toList(),// required
+        model: "SSDMobileNet",
+        // model: "YOLO",
+        imageHeight: image.height,
+        imageWidth: image.width,
+        imageMean: 127.5,   // defaults to 127.5
+        imageStd: 127.5,    // defaults to 127.5
+        rotation: 90,       // defaults to 90, Android only
+        // numResults: 2,      // defaults to 5
+        threshold: 0.1,     // defaults to 0.1
+        asynch: true        // defaults to true
     );
+
+    // var detector = await Tflite.detectObjectOnFrame(
+    //     bytesList: image.planes.map((plane) {return plane.bytes;}).toList(),// required
+    //     model: "YOLO",
+    //     imageHeight: image.height,
+    //     imageWidth: image.width,
+    //     imageMean: 0,         // defaults to 127.5
+    //     imageStd: 255.0,      // defaults to 127.5
+    //     // numResults: 2,        // defaults to 5
+    //     threshold: 0.1,       // defaults to 0.1
+    //     numResultsPerClass: 2,// defaults to 5
+    //     // anchors: anchors,     // defaults to [0.57273,0.677385,1.87446,2.06253,3.33843,5.47434,7.88282,3.52778,9.77052,9.16828]
+    //     blockSize: 32,        // defaults to 32
+    //     numBoxesPerBlock: 5,  // defaults to 5
+    //     asynch: true          // defaults to true
+    // );
 
     if(detector != null){
       log("Result is $detector ");
       var ourDectectedObject = detector.first;
-        // if(ourDectectedObject['confidenceInClass'] * 100 > 45){
-      log("Result is $ourDectectedObject ");
-          label = ourDectectedObject['label'];
+        if(ourDectectedObject['confidenceInClass'] * 100 > 60) {
+          log("Result is $ourDectectedObject ");
+          label = ourDectectedObject['detectedClass'];
+          print("height $label");
           h = ourDectectedObject["rect"]["h"];
           print("height $h");
-          // w = ourDectectedObject["rect"];
-          // print("width $w");
-          // y = ourDectectedObject["rect"];
-          // x = ourDectectedObject["rect"];
-          update();
+          w = ourDectectedObject["rect"]["w"];
+          print("width $w");
+          y = ourDectectedObject["rect"]["y"];
+          x = ourDectectedObject["rect"]["x"];
+        }
+      update();
       // }
     }
+
   }
 }
